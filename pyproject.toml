@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "auth-service"
+version = "0.1.0"
+description = "Authentication service"
+authors = ["Kostiantyn Ivashchenko <kivaschenko@protonmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic-settings = "^2.4.0"
+uvicorn = "^0.30.5"
+python-multipart = "^0.0.9"
+aiokafka = "^0.11.0"
+confluent-kafka = "^2.5.0"
+asyncio = "^3.4.3"
+
+[tool.poetry.group.dev.dependencies]
+fastapi = "^0.112.0"
+uvicorn = "^0.30.5"
+asyncpg = "^0.29.0"
+black = "^24.8.0"
+email-validator = "^2.2.0"
+PyJWT = "^2.9.0"
+bcrypt = "^4.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
