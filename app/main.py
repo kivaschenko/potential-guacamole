@@ -159,6 +159,7 @@ async def login_for_access_token(
     repo: AsyncpgUserRepository = Depends(get_user_repository),
 ) -> Token:
     """Create an access token for the user."""
+    print(form_data.__dict__, "form_data")
     user = await authenticate_user(repo, form_data.username, form_data.password)
     if not user:
         logging.error("Incorrect username or password")
@@ -183,7 +184,7 @@ async def read_users_me(
 
 
 @app.post(
-    "/users/",
+    "/users",
     response_model=UserInResponse,
     status_code=status.HTTP_201_CREATED,
     tags=["users"],
@@ -193,6 +194,17 @@ async def create_user(
     background_tasks: BackgroundTasks,
     repo: AsyncpgUserRepository = Depends(get_user_repository),
 ):
+    # Check if the username already exists
+    existing_user_by_username = await repo.get_by_username(user.username)
+    if existing_user_by_username:
+        raise HTTPException(status_code=400, detail="Username already exists")
+
+    # Check if the email already exists
+    existing_user_by_email = await repo.get_by_email(user.email)
+    if existing_user_by_email:
+        raise HTTPException(status_code=400, detail="Email already exists")
+
+    # Hash the password and create the user
     hashed_password = get_password_hash(user.password)
     user_to_db = UserInDB(
         hashed_password=hashed_password,
@@ -203,12 +215,14 @@ async def create_user(
     new_user = await repo.create(user_to_db)
     if new_user is None:
         raise HTTPException(status_code=400, detail="User already exists")
+
+    # Add background task to send a message to Kafka
     background_tasks.add_task(send_message_to_kafka_about_new_user, new_user)
     return new_user
 
 
 @app.get(
-    "/users/",
+    "/users",
     response_model=list[UserInResponse],
     status_code=status.HTTP_200_OK,
     tags=["users"],

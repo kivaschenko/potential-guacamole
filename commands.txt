@@ -1,0 +1,20 @@
+# Create a new user
+http POST http://localhost:8000/users username=teomeo email=teodorathome@yahoo.com full_name='Teo Meo' password=seecretword
+
+# Login to get an access token
+http -f POST http://localhost:8000/token username=teomeo password=seecretword
+
+# Get the current user's information
+http GET http://localhost:8000/users/me "Authorization: Bearer <access_token>"
+
+# Get all users
+http GET http://localhost:8000/users "Authorization: Bearer <access_token>"
+
+# Get a specific user by ID
+http GET http://localhost:8000/users/1 "Authorization: Bearer <access_token>"
+
+# Update a user
+http PUT http://localhost:8000/users/1 username=newusername email=newemail@example.com full_name='New Name' password=newpassword "Authorization: Bearer <access_token>"
+
+# Delete a user
+http DELETE http://localhost:8000/users/1 "Authorization: Bearer <access_token>"
